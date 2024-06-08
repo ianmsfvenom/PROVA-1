@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id                  String      @id @default(uuid())
+  name                String
+  email               String
+  password            String
+  username            String
+  accessToken         AccessToken?
+  reviews             Review[]
+  review_evaluations  ReviewEvaluation[]
+
+  @@map("user")
+}
+
+model AccessToken {
+  id              String      @id @default(uuid())
+  token_string    String      
+  user            User        @relation(fields: [user_id], references: [id])
+  user_id         String      @unique
+  creation_date   DateTime
+
+
+  @@map("accesstoken")
+}
+
+model Genre {
+  id              String      @id @default(uuid())
+  genre           String
+  movies          Movie[]
+
+  @@map("genre")
+}
+
+model Movie {
+  id                  String      @id @default(uuid())
+  title               String
+  synopsis            String
+  duration_minutes    Int
+  release_date        String
+  poster_url          String
+  trailer_url         String
+  genre_id            String      @unique
+  genre               Genre       @relation(fields: [genre_id], references: [id])
+  reviews             Review[]
+  credits             Credit[]
+  @@map("movie")
+}
+
+model Review {
+  id                  String      @id @default(uuid())
+  user                User        @relation(fields: [user_id], references: [id])
+  movie               Movie       @relation(fields: [movie_id], references: [id])
+  user_id             String
+  movie_id            String
+  content             String
+  stars               Int
+  createdAt           DateTime
+  review_evaluations  ReviewEvaluation[]
+
+  @@map("review")
+}
+
+model Artist {
+  id              String      @id @default(uuid())
+  name            String
+  birth_date      String
+  photo_url       String
+  biography       String
+  credits         Credit[]
+
+  @@map("artits")
+}
+
+model Role {
+  id          String        @id @default(uuid())
+  title       String
+  credits     Credit[]
+
+  @@map("role")
+}
+
+model Credit {
+  id          String        @id @default(uuid())
+  movie       Movie         @relation(fields: [movie_id], references: [id])
+  artist      Artist        @relation(fields: [artist_id], references: [id])
+  role        Role          @relation(fields: [role_id], references: [id])
+  movie_id    String        
+  artist_id   String
+  role_id     String
+
+  @@map("credit")
+}
+
+model ReviewEvaluation {
+  id          String      @id @default(uuid())
+  review      Review      @relation(fields: [review_id], references: [id])
+  review_id   String
+  user        User        @relation(fields: [user_id], references: [id])
+  user_id     String        
+  positive    Boolean
+
+  @@map("reviewevaluation")
+}

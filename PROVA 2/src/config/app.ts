@@ -1,0 +1,1 @@
+export const host = process.env.HOST ?? `http://localhos:3000`
